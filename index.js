@@ -19,18 +19,69 @@ class Boundary {
     cContext.fillStyle = 'blue';
     cContext.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
-}
+};
 
-//<< cria o mapa de forma mais fácil de compreender
+class Player {
+  constructor({ position, velocity }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.radius = 15;
+  }
+
+  draw() {
+    cContext.beginPath();
+    cContext.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    cContext.fillStyle = 'yellow';
+    cContext.fill();
+    cContext.closePath();
+  }
+
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  }
+};
+
+// cria o mapa de forma mais fácil de compreender
+const boundaries = [];
+const player = new Player({
+  position: {
+    x: Boundary.width + Boundary.width / 2,
+    y: Boundary.height + Boundary.height / 2
+  },
+  velocity: {
+    x: 0,
+    y: 0
+  }
+});
+
+const keys = {
+  w: {
+    isPressed: false,
+  },
+  a: {
+    isPressed: false,
+  },
+  s: {
+    isPressed: false,
+  },
+  d: {
+    isPressed: false,
+  }
+};
+
 const map = [
-  ['-', '-', '-', '-', '-', '-', ],
-  ['-', ' ', ' ', ' ', ' ', '-', ],
-  ['-', ' ', '-', '-', ' ', '-', ],
-  ['-', ' ', ' ', ' ', ' ', '-', ],
-  ['-', '-', '-', '-', '-', '-', ]
+  ['-', '-', '-', '-', '-', '-', '-'],
+  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+  ['-', ' ', '-', ' ', '-', ' ', '-'],
+  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+  ['-', ' ', '-', ' ', '-', ' ', '-'],
+  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+  ['-', '-', '-', '-', '-', '-', '-']
 ];
 
-const boundaries = [];
+let lastKey = '';
 
 map.forEach((row, indexRow) => {
   row.forEach((symbol, indexSymbol) => {
@@ -47,9 +98,137 @@ map.forEach((row, indexRow) => {
         break;
     }
   })
-})
-
-boundaries.forEach((boundary) => { 
-  boundary.draw();
 });
-// cria o mapa de forma mais fácil de compreender >>\\
+
+function colisionMap({ circle, rectangle }) {
+  return (circle.position.y - circle.radius + circle.velocity.y <=
+    rectangle.position.y + rectangle.height &&
+    circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x &&
+    circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y &&
+    circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width)
+};
+
+function animate() {
+  requestAnimationFrame(animate);
+  // console.log('animate');
+
+  cContext.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (keys.w.isPressed && lastKey === 'w') {
+    for (let index = 0; index < boundaries.length; index++) {
+      const boundary = boundaries[index];
+      if(colisionMap({
+        circle: { ...player, velocity: { x: 0, y: -5 } },
+        rectangle: boundary
+      })) {
+        player.velocity.y = 0;
+        break
+      } else {
+        player.velocity.y = -5;
+      }
+    }
+
+  } else if (keys.a.isPressed && lastKey === 'a') {
+    for (let index = 0; index < boundaries.length; index++) {
+      const boundary = boundaries[index];
+      if(colisionMap({
+        circle: { ...player, velocity: { x: -5, y: 0 } },
+        rectangle: boundary
+      })) {
+        player.velocity.x = 0;
+        break
+      } else {
+        player.velocity.x = -5;
+      }
+    }
+
+  } else if (keys.s.isPressed && lastKey === 's') {
+    for (let index = 0; index < boundaries.length; index++) {
+      const boundary = boundaries[index];
+      if(colisionMap({
+        circle: { ...player, velocity: { x: 0, y: 5 } },
+        rectangle: boundary
+      })) {
+        player.velocity.y = 0;
+        break
+      } else {
+        player.velocity.y = 5;
+      }
+    }
+
+  } else if (keys.d.isPressed && lastKey === 'd') {
+    for (let index = 0; index < boundaries.length; index++) {
+      const boundary = boundaries[index];
+      if(colisionMap({
+        circle: { ...player, velocity: { x: 5, y: 0 } },
+        rectangle: boundary
+      })) {
+        player.velocity.x = 0;
+        break
+      } else {
+        player.velocity.x = 5;
+      }
+    }
+  }
+
+  boundaries.forEach((boundary) => {
+    boundary.draw();
+
+    if (colisionMap({ circle: player, rectangle: boundary })) {
+        player.velocity.x = 0;
+        player.velocity.y = 0;
+      }
+  });
+  
+  player.update();
+  player.velocity.x = 0;
+  player.velocity.y = 0;
+};
+
+animate();
+
+// Event Listeners
+// Ao pressionar as teclas o Player se move
+window.addEventListener('keydown', ({ key }) => {
+  // console.log(key); // mostra a tecla pressionada
+  switch(key) {
+    case 'w':
+      keys.w.isPressed = true
+      lastKey = 'w';
+      break;
+    case 'a':
+      keys.a.isPressed = true
+      lastKey = 'a';
+      break;
+    case 's':
+      keys.s.isPressed = true
+      lastKey = 's';
+      break;
+    case 'd':
+      keys.d.isPressed = true
+      lastKey = 'd';
+      break;
+  }
+  // console.log(keys.d.isPressed);
+  // console.log(keys.s.isPressed);
+});
+
+// ao soltar a tecla o Player para
+window.addEventListener('keyup', ({ key }) => {
+  // console.log(key); // mostra a tecla pressionada
+  switch(key) {
+    case 'w':
+      keys.w.isPressed = false;
+      break;
+    case 'a':
+      keys.a.isPressed = false;
+      break;
+    case 's':
+      keys.s.isPressed = false;
+      break;
+    case 'd':
+      keys.d.isPressed = false;
+      break;
+  }
+  // console.log(player.velocity);
+});
