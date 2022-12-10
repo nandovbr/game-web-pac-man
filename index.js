@@ -9,15 +9,18 @@ class Boundary {
   static width = 40;
   static height = 40;
 
-  constructor({ position }) {
+  constructor({ position, image }) {
     this.position = position;
     this.width = 40;
     this.height = 40;
+    this.image = image;
   }
 
   draw() {
-    cContext.fillStyle = 'blue';
-    cContext.fillRect(this.position.x, this.position.y, this.width, this.height);
+    // cContext.fillStyle = 'blue';
+    // cContext.fillRect(this.position.x, this.position.y, this.width, this.height);
+
+    cContext.drawImage(this.image, this.position.x, this.position.y);
   }
 };
 
@@ -71,17 +74,29 @@ const keys = {
   }
 };
 
+let lastKey = '';
+
 const map = [
-  ['-', '-', '-', '-', '-', '-', '-'],
-  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
-  ['-', ' ', '-', ' ', '-', ' ', '-'],
-  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
-  ['-', ' ', '-', ' ', '-', ' ', '-'],
-  ['-', ' ', ' ', ' ', ' ', ' ', '-'],
-  ['-', '-', '-', '-', '-', '-', '-']
+  ['1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '2'],
+  ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
+  ['|', '.', 'b', '.', '[', '7', ']', '.', 'b', '.', '|'],
+  ['|', '.', '.', '.', '.', '_', '.', '.', '.', '.', '|'],
+  ['|', '.', '[', ']', '.', '.', '.', '[', ']', '.', '|'],
+  ['|', '.', '.', '.', '.', '^', '.', '.', '.', '.', '|'],
+  ['|', '.', 'b', '.', '[', '+', ']', '.', 'b', '.', '|'],
+  ['|', '.', '.', '.', '.', '_', '.', '.', '.', '.', '|'],
+  ['|', '.', '[', ']', '.', '.', '.', '[', ']', '.', '|'],
+  ['|', '.', '.', '.', '.', '^', '.', '.', '.', '.', '|'],
+  ['|', '.', 'b', '.', '[', '5', ']', '.', 'b', '.', '|'],
+  ['|', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
+  ['4', '-', '-', '-', '-', '-', '-', '-', '-', '-', '3']
 ];
 
-let lastKey = '';
+function createImage(src) {
+  const image = new Image();
+  image.src = src;
+  return image;
+};
 
 map.forEach((row, indexRow) => {
   row.forEach((symbol, indexSymbol) => {
@@ -92,7 +107,162 @@ map.forEach((row, indexRow) => {
           position: {
             x: Boundary.width * indexSymbol,
             y: Boundary.height * indexRow
-          }
+          },
+          image: createImage('./images-map/pipeHorizontal.png')
+        })
+      );
+        break;
+      case '|':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeVertical.png')
+        })
+      );
+        break;
+      case '1':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeCorner1.png')
+        })
+      );
+        break;
+      case '2':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeCorner2.png')
+        })
+      );
+        break;
+      case '3':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeCorner3.png')
+        })
+      );
+        break;
+      case '4':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeCorner4.png')
+        })
+      );
+        break;
+      case 'b':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/block.png')
+        })
+      );
+        break;
+      case '[':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/capLeft.png')
+        })
+      );
+        break;
+      case ']':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/capRight.png')
+        })
+      );
+        break;
+      case '_':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/capBottom.png')
+        })
+      );
+        break;
+      case '^':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/capTop.png')
+        })
+      );
+        break;
+      case '+':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          image: createImage('./images-map/pipeCross.png')
+        })
+      );
+        break;
+      case '5':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          color: 'blue',
+          image: createImage('./images-map/pipeConnectorTop.png')
+        })
+      );
+        break;
+      case '6':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          color: 'blue',
+          image: createImage('./images-map/pipeConnectorRight.png')
+        })
+      );
+        break;
+      case '7':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          color: 'blue',
+          image: createImage('./images-map/pipeConnectorBottom.png')
+        })
+      );
+        break;
+      case '8':
+        boundaries.push(new Boundary({
+          position: {
+            x: Boundary.width * indexSymbol,
+            y: Boundary.height * indexRow
+          },
+          // color: 'blue',
+          image: createImage('./images-map/pipeConnectorLeft.png')
         })
       );
         break;
