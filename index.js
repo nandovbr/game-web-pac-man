@@ -365,11 +365,17 @@ function animate() {
     }
   }
 
-  LittleDots.forEach((LittleDot) => {
+  for (let index = LittleDots.length -1; 0< index; index--) {
+    const LittleDot = LittleDots[index];
+
     LittleDot.draw();
 
-    
-  });
+    // some com o LittleDot quando o Player colide com ele
+    if (Math.hypot(LittleDot.position.x - player.position.x,
+      LittleDot.position.y - player.position.y) < LittleDot.radius + player.radius) {
+        LittleDots.splice(index, 1);
+      }
+  };
 
   boundaries.forEach((boundary) => {
     boundary.draw();
